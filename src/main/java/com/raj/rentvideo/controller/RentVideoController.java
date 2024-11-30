@@ -3,6 +3,9 @@ package com.raj.rentvideo.controller;
 import com.raj.rentvideo.dto.VideoEntityDto;
 import com.raj.rentvideo.exception.InvalidRequestException;
 import com.raj.rentvideo.exception.NoDataFoundException;
+import com.raj.rentvideo.exception.VideoRentalThresholdException;
+import com.raj.rentvideo.exception.VideoUnavailableException;
+import com.raj.rentvideo.exchange.RentVideoResponse;
 import com.raj.rentvideo.exchange.RetrieveVideosResponse;
 import com.raj.rentvideo.exchange.VideoResponse;
 import com.raj.rentvideo.service.RentVideoService;
@@ -25,7 +28,7 @@ public class RentVideoController {
             if (null != videoEntityDto) {
                 VideoResponse videoResponse = rentVideoService.createVideo(videoEntityDto);
                 return ResponseEntity.status(HttpStatus.CREATED).body(videoResponse);
-            }else throw new InvalidRequestException("Invalid Request");
+            } else throw new InvalidRequestException("Invalid Request");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -69,6 +72,36 @@ public class RentVideoController {
         }
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("No videos found");
+
+    }
+
+    @PutMapping("/users/{userId}/videos/{videoId}/rent")
+    @PreAuthorize("hasAuthority('CUSTOMER')")
+    public ResponseEntity<?> rentVideo(@PathVariable Long userId, @PathVariable Long videoId) {
+        RentVideoResponse rentVideoResponse = null;
+        try {
+            rentVideoResponse = rentVideoService.rentVideoService(userId, videoId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(rentVideoResponse);
+        } catch (VideoUnavailableException | NoDataFoundException | VideoRentalThresholdException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+
+
+    }
+
+    @PutMapping("/users/{userId}/videos/{videoId}/return")
+    @PreAuthorize("hasAuthority('CUSTOMER')")
+    public ResponseEntity<?> returnVideo(@PathVariable Long userId, @PathVariable Long videoId) {
+        RentVideoResponse rentVideoResponse = null;
+        try {
+            rentVideoResponse = rentVideoService.returnVideoService(userId, videoId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(rentVideoResponse);
+        } catch (NoDataFoundException | InvalidRequestException e) {
+            e.getStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+
 
     }
 

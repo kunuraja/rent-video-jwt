@@ -22,6 +22,9 @@ public class AuthService {
     UserEntityRepository userEntityRepository;
 
     @Autowired
+    JWTService jwtService;
+
+    @Autowired
     AuthenticationManager authenticationManager;
 
     public AuthResponse register(RegisterRequest request) {
@@ -39,7 +42,13 @@ public class AuthService {
 
         userEntityRepository.save(userEntity);
 
-        return AuthResponse.builder().build();
+        String jwtToken = jwtService.generateToken(userEntity);
+        userEntityRepository.save(userEntity);
+        return AuthResponse.builder()
+                .accessToken(jwtToken)
+                .build();
+        // Used in Basic Auth
+        //   return AuthResponse.builder().build();
 
     }
 
@@ -47,7 +56,13 @@ public class AuthService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(), request.getPassword()));
-        return AuthResponse.builder().build();
+        UserEntity userEntity = userEntityRepository.findByEmail(request.getEmail());
+        String jwtToken = jwtService.generateToken(userEntity);
+        return AuthResponse.builder()
+                .accessToken(jwtToken)
+                .build();
+        // Basic Auth
+        //return AuthResponse.builder().build();
     }
 
 }

@@ -1,11 +1,17 @@
 package com.raj.rentvideo.service;
 
 import com.raj.rentvideo.dto.VideoEntityDto;
+import com.raj.rentvideo.entity.UserEntity;
 import com.raj.rentvideo.entity.VideoEntity;
 import com.raj.rentvideo.enums.AvailableEnum;
+import com.raj.rentvideo.exception.InvalidRequestException;
 import com.raj.rentvideo.exception.NoDataFoundException;
+import com.raj.rentvideo.exception.VideoRentalThresholdException;
+import com.raj.rentvideo.exception.VideoUnavailableException;
+import com.raj.rentvideo.exchange.RentVideoResponse;
 import com.raj.rentvideo.exchange.RetrieveVideosResponse;
 import com.raj.rentvideo.exchange.VideoResponse;
+import com.raj.rentvideo.repository.UserEntityRepository;
 import com.raj.rentvideo.repository.VideoEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +24,9 @@ public class RentVideoServiceImpl implements RentVideoService {
 
     @Autowired
     VideoEntityRepository videoEntityRepository;
+
+    @Autowired
+    UserEntityRepository userEntityRepository;
 
 
     @Override
@@ -85,5 +94,83 @@ public class RentVideoServiceImpl implements RentVideoService {
 
         System.out.println(retrieveVideosResponse.getVideoEntityDtoList());
         return retrieveVideosResponse;
+    }
+
+    @Override
+    public RentVideoResponse rentVideoService(Long userId, Long videoId) throws VideoUnavailableException, NoDataFoundException, VideoRentalThresholdException {
+        RentVideoResponse rentVideoResponse = new RentVideoResponse();
+        if (userId != null && videoId != null){
+            Optional<UserEntity> userOptional = userEntityRepository.findById(userId);
+            Optional<VideoEntity> videoOptional = videoEntityRepository.findById(videoId);
+
+            if (userOptional.isPresent() && videoOptional.isPresent()){
+                UserEntity retrievedUser = userOptional.get();
+                VideoEntity retrivedVideo = videoOptional.get();
+                if (retrivedVideo.getAvailable().equals(AvailableEnum.UNAVAILABLE)){
+                    throw new VideoUnavailableException("Video is currently unavailable");
+                };
+                // Find the list of videos by a particular user
+                List<Long> videoIds = videoEntityRepository.findAllVideosByUserId(userId);
+                System.out.println("videoIds :"+ videoIds);
+                if (videoIds.size() == 2) throw new VideoRentalThresholdException("Maximum 2 video rentals allowed");
+                retrivedVideo.setAvailable(AvailableEnum.UNAVAILABLE);
+                retrievedUser.getRentalVideos().add(videoOptional.get());
+                UserEntity savedUser = userEntityRepository.save(retrievedUser);
+                //RentVideoResponse rentVideoResponse = new RentVideoResponse();
+                rentVideoResponse.setFirstName(savedUser.getFirstName());
+                rentVideoResponse.setLastName(savedUser.getLastName());
+                rentVideoResponse.setEmail(savedUser.getEmail());
+                // find all videos ids for a particular user
+                List<Long> totalVideoIds = videoEntityRepository.findAllVideosByUserId(userId);
+                System.out.println(" :"+ totalVideoIds);
+                // add all videos to the RentVideoResponse
+                rentVideoResponse.getRentalVideos().addAll(totalVideoIds);
+                System.out.println(rentVideoResponse);
+                return rentVideoResponse;
+
+            }else throw new NoDataFoundException("Invalid user Id or video Id");
+
+        }
+        return rentVideoResponse;
+    }
+
+    @Override
+    public RentVideoResponse returnVideoService(Long userId, Long videoId) throws InvalidRequestException, NoDataFoundException {
+
+        RentVideoResponse rentVideoResponse = new RentVideoResponse();
+        if (userId != null && videoId != null){
+            Optional<UserEntity> userOptional = userEntityRepository.findById(userId);
+            Optional<VideoEntity> videoOptional = videoEntityRepository.findById(videoId);
+
+            if (userOptional.isPresent() && videoOptional.isPresent()){
+                UserEntity retrievedUser = userOptional.get();
+                VideoEntity retrivedVideo = videoOptional.get();
+                if (retrivedVideo.getAvailable().equals(AvailableEnum.AVAILABLE)){
+                    throw new InvalidRequestException("Video id is invalid");
+                };
+                // find all videos ids for a particular user
+                List<Long> videoIds = videoEntityRepository.findAllVideosByUserId(userId);
+                System.out.println(videoIds);
+                if (!videoIds.isEmpty()) {
+                    retrivedVideo.setAvailable(AvailableEnum.AVAILABLE);
+                    retrievedUser.getRentalVideos().remove(retrivedVideo);
+                    UserEntity savedUser = userEntityRepository.save(retrievedUser);
+                    //RentVideoResponse rentVideoResponse = new RentVideoResponse();
+                    rentVideoResponse.setFirstName(savedUser.getFirstName());
+                    rentVideoResponse.setLastName(savedUser.getLastName());
+                    rentVideoResponse.setEmail(savedUser.getEmail());
+                    // Remaining videos after the return of video
+                    List<Long> remainingVideoIds = videoEntityRepository.findAllVideosByUserId(userId);
+                    System.out.println("remainingVideoIds :" + remainingVideoIds);
+                    // add all videos to the RentVideoResponse
+                    rentVideoResponse.getRentalVideos().addAll(remainingVideoIds);
+                    System.out.println(rentVideoResponse);
+                    return rentVideoResponse;
+                }
+
+            }else throw new NoDataFoundException("Invalid user Id or video Id");
+
+        }
+        return rentVideoResponse;
     }
 }

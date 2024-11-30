@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity(name = "video")
+@Entity(name = "Video")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
