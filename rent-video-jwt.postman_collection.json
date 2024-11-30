@@ -1,0 +1,140 @@
+{
+	"info": {
+		"_postman_id": "237edcc9-df66-4895-afc6-dedabff83c40",
+		"name": "rent-video-jwt",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "11595394",
+		"_collection_link": "https://galactic-firefly-715314.postman.co/workspace/crio-coderhack~956b42b3-e470-4337-a0d0-7cb09c311f36/collection/11595394-237edcc9-df66-4895-afc6-dedabff83c40?action=share&source=collection_link&creator=11595394"
+	},
+	"item": [
+		{
+			"name": "registerUserJwt",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": "http://localhost:8080/register"
+			},
+			"response": []
+		},
+		{
+			"name": "createVideo",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJybS5hZG1pbkBnbWFpbC5jb20iLCJpYXQiOjE3MzI4OTY3MDQsImV4cCI6MTczMjk4MzEwNH0._SB7B4FE_2k4o86S9No_x0uP_pF2eiNy61RjKuieJfs"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"vid1\",\r\n    \"director\": \"director1\",\r\n    \"genre\": \"genre1\",\r\n    \"available\": \"AVAILABLE\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8080/videos"
+			},
+			"response": []
+		},
+		{
+			"name": "loginUser",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\" : \"rm3.admin@gmail.com\",\r\n    \"password\" : \"rm1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8080/login"
+			},
+			"response": []
+		},
+		{
+			"name": "rentVideo",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJybUBnbWFpbC5jb20iLCJpYXQiOjE3MzI4OTkzOTYsImV4cCI6MTczMjk4NTc5Nn0.zSVnz_fcBRgA5HQHjT4eKykFJGsHCcKI1fU9BgMMt_g"
+					}
+				},
+				"method": "PUT",
+				"header": [],
+				"url": "http://localhost:8080/users/1/videos/2/rent"
+			},
+			"response": []
+		},
+		{
+			"name": "returnVideo",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJybUBnbWFpbC5jb20iLCJpYXQiOjE3MzI4OTkzOTYsImV4cCI6MTczMjk4NTc5Nn0.zSVnz_fcBRgA5HQHjT4eKykFJGsHCcKI1fU9BgMMt_g"
+					}
+				},
+				"method": "PUT",
+				"header": [],
+				"url": "http://localhost:8080/users/1/videos/1/return"
+			},
+			"response": []
+		},
+		{
+			"name": "deleteVideo",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJybTMuYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNzMyOTA2MTI1LCJleHAiOjE3MzI5OTI1MjV9.dojxvYkaRz_6aBFtWBrl5O7aBdvvUiqyIVB-71BXJck"
+					}
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:8080/videos/3"
+			},
+			"response": []
+		},
+		{
+			"name": "updateVideo",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJybTMuYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNzMyOTA2MTI1LCJleHAiOjE3MzI5OTI1MjV9.dojxvYkaRz_6aBFtWBrl5O7aBdvvUiqyIVB-71BXJck"
+					}
+				},
+				"method": "PUT",
+				"header": [],
+				"url": "http://localhost:8080/videos/1"
+			},
+			"response": []
+		},
+		{
+			"name": "retrieveVideos",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJybUBnbWFpbC5jb20iLCJpYXQiOjE3MzI5NDM4NDEsImV4cCI6MTczMzAzMDI0MX0.kRfwJBd7Ag81FXrE4w7NZdHpWTFt8xrJzsGNpFt6-28"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/videos"
+			},
+			"response": []
+		}
+	]
+}
