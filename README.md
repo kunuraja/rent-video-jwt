@@ -33,6 +33,5 @@ PUT /users/{userId}/videos/{videoId}/rent - Applying for rent (Customer)
 
 PUT /users/{userId}/videos/{videoId}/return - Returning a video (Customer)
 
-The postman collection is added to this project repository.
+The Postman collection has been added to this project repository.
 
-PUT /students/{studentId}/subjects/{subjectId}/exams/{examId} - For registerin a registered student into the exam for the corresponding subject
